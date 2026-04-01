@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu Catálogo de Produtos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .product-card:hover { transform: translateY(-5px); transition: all 0.3s ease; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 antialiased">
+
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-6 flex justify-between items-center">
+            <h1 class="text-2xl font-bold text-indigo-600 tracking-tight">MINHA_MARCA</h1>
+            <nav>
+                <a href="#catalogo" class="text-gray-600 hover:text-indigo-600 font-medium">Produtos</a>
+            </nav>
+        </div>
+    </header>
+
+    <section class="bg-indigo-600 py-16 px-4">
+        <div class="max-w-4xl mx-auto text-center">
+            <h2 class="text-4xl font-extrabold text-white mb-4">Conheça nossa Coleção</h2>
+            <p class="text-indigo-100 text-lg">Produtos exclusivos selecionados para você. Navegue e inspire-se.</p>
+        </div>
+    </section>
+
+    <main id="catalogo" class="max-w-7xl mx-auto px-4 py-12">
+        <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+            </div>
+    </main>
+
+    <footer class="bg-gray-900 text-gray-400 py-10 border-t border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <p>&copy; 2024 Minha Marca - Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <script>
+        // BANCO DE DADOS SIMPLIFICADO (JSON)
+        // Dica de Sênior: Para trocar a imagem, coloque o arquivo na mesma pasta e mude o nome aqui.
+        const produtos = [
+            {
+                nome: "Relógio Executivo",
+                descricao: "Acabamento em aço escovado com pulseira de couro legítimo.",
+                imagem: "https://images.unsplash.com/photo-1524592094714-0f0654e20314?auto=format&fit=crop&q=80&w=400",
+                categoria: "Acessórios"
+            },
+            {
+                nome: "Fone Noise Cancelling",
+                descricao: "Qualidade de áudio profissional com cancelamento de ruído ativo.",
+                imagem: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&q=80&w=400",
+                categoria: "Eletrônicos"
+            },
+            {
+                nome: "Câmera Vintage",
+                descricao: "Design retrô com tecnologia de sensores modernos.",
+                imagem: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&q=80&w=400",
+                categoria: "Fotografia"
+            },
+            {
+                nome: "Mochila Tech",
+                descricao: "Compartimento para notebook de 15 polegadas e resistente à água.",
+                imagem: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&q=80&w=400",
+                categoria: "Acessórios"
+            }
+        ];
+
+        // Função para renderizar os cards
+        function renderizarProdutos() {
+            const grid = document.getElementById('product-grid');
+            
+            grid.innerHTML = produtos.map(prod => `
+                <div class="product-card bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 flex flex-col">
+                    <div class="h-64 overflow-hidden">
+                        <img src="${prod.imagem}" alt="${prod.nome}" class="w-full h-full object-cover">
+                    </div>
+                    <div class="p-6 flex-grow">
+                        <span class="text-xs font-semibold text-indigo-500 uppercase tracking-wider">${prod.categoria}</span>
+                        <h3 class="text-xl font-bold mt-2 text-gray-900">${prod.nome}</h3>
+                        <p class="text-gray-600 mt-2 text-sm leading-relaxed">${prod.descricao}</p>
+                    </div>
+                    <div class="p-6 pt-0 mt-auto">
+                        <button class="w-full bg-gray-100 text-gray-800 font-semibold py-2 rounded-lg hover:bg-indigo-600 hover:text-white transition-colors">
+                            Ver Detalhes
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Executa a renderização ao carregar a página
+        document.addEventListener('DOMContentLoaded', renderizarProdutos);
+    </script>
+</body>
+</html>

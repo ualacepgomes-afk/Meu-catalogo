@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo de Camisas - Oficial</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        .product-card { transition: all 0.3s ease; }
+        .product-card:hover { transform: translateY(-5px); }
+        #zoom-modal { display: none; }
+        .btn-time { transition: all 0.2s ease-in-out; }
+
+        /* Estilo da Lupa no Modal */
+        #img-zoom-modal {
+            cursor: zoom-in;
+            transition: transform 0.1s ease-out;
+            position: relative;
+        }
+
+        #img-zoom-modal.zoom-active {
+            cursor: zoom-out;
+            transform: scale(2.5) !important;
+            z-index: 110;
+        }
+
+        #zoom-modal {
+            overflow: hidden;
+            touch-action: none;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 antialiased">
+
+    <div id="zoom-modal" class="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center transition-opacity duration-300 opacity-0 pointer-events-none" onclick="fecharZoom()">
+        <button class="absolute top-5 right-5 text-white text-5xl font-light z-[120]">&times;</button>
+        <img id="img-zoom-modal" src="" alt="Zoom" class="max-w-[90%] max-h-[90vh] rounded-lg shadow-2xl object-contain transform scale-95 transition-transform duration-300">
+    </div>
+
+    <header class="relative shadow-md sticky top-0 z-50 bg-gray-900 overflow-hidden" 
+        style="background-image: url('https://nglucnzkhofiungybxls.supabase.co/storage/v1/object/public/imagens/imagenss/imagensclubes.png'); background-size: cover; background-position: center;">
+        <div class="absolute inset-0 bg-black/50 z-10"></div>
+        <div class="max-w-7xl mx-auto px-4 py-12 text-center relative z-20">
+            <h1 class="text-4xl md:text-6xl font-black text-white tracking-tighter uppercase mb-3 drop-shadow-lg">
+                CAMISA DE TIME É ROUPA DE SAIR SIM!
+            </h1>
+            <p class="text-indigo-300 font-bold uppercase tracking-widest text-sm drop-shadow">
+                Catálogo Oficial - As Melhores do Mundo
+            </p>
+        </div>
+    </header>
+
+    <div class="flex flex-wrap justify-center gap-4 py-8 bg-white border-b shadow-sm px-4">
+        <button onclick="filtrarGeral()" class="px-6 py-2 rounded-full bg-indigo-600 text-white font-bold hover:bg-indigo-700 transition shadow-md">Todos</button>
+        <button onclick="filtrarPorTipo('Brasileira')" class="px-6 py-2 rounded-full bg-gray-100 text-gray-700 font-bold hover:bg-green-600 hover:text-white transition">Brasileiras</button>
+        <button onclick="filtrarPorTipo('Europeia')" class="px-6 py-2 rounded-full bg-gray-100 text-gray-700 font-bold hover:bg-blue-600 hover:text-white transition">Europeias</button>
+        <button onclick="filtrarPorTipo('Selecao')" class="px-6 py-2 rounded-full bg-gray-100 text-gray-700 font-bold hover:bg-yellow-500 hover:text-black transition">Seleções</button>
+    </div>
+    
+    <div id="container-filtros-times" class="flex flex-wrap justify-center gap-2 py-6 bg-gray-50 px-4 border-b">
+        <button data-tipo="Brasileira" onclick="filtrar('Flamengo')" class="btn-time text-xs px-4 py-1 rounded-full bg-white border hover:bg-red-600 hover:text-white transition">Flamengo</button>
+        <button data-tipo="Brasileira" onclick="filtrar('Vasco')" class="btn-time text-xs px-4 py-1 rounded-full bg-white border hover:bg-black hover:text-white transition">Vasco</button>
+        <button data-tipo="Brasileira" onclick="filtrar('Palmeiras')" class="btn-time text-xs px-4 py-1 rounded-full bg-white border hover:bg-green-600 hover:text-white transition">Palmeiras</button>
+        <button data-tipo="Brasileira" onclick="filtrar('Corinthians')" class="btn-time text-xs px-4 py-1 rounded-full bg-white border hover:bg-black hover:text-white transition">Corinthians</button>
+        <button data-tipo="Brasileira" onclick="filtrar('Bahia')" class="btn-time text-xs px-4 py-1 rounded-full bg-white border hover:bg-blue-700 hover:text-white transition">Bahia</button>
+        <button data-tipo="Brasileira" onclick="filtrar('Botafogo')" class="btn-time text-xs px-4 py-1 rounded-full bg-white border hover:bg-black hover:text-white transition">Botafogo</button>
+        <button data-tipo="Brasileira" onclick="filtrar('Atletico mg')" class="btn-time text-xs px-4 py-1 rounded-full bg-white border hover:bg-black hover:text-white transition">Atletico mg</button>
+        <button data-tipo="Brasileira" onclick="filtrar('Atletico pr')" class="btn-time text-xs px-4 py-1 rounded-full bg-white border hover:bg-red-700 hover:text-white transition">Atletico pr</button>
+        <button data-tipo="Brasileira" onclick="filtrar('Fluminense')" class="btn-time text-xs px-4 py-1 rounded-full bg-white border hover:bg-red-900 hover:text-white transition">Fluminense</button>
+        <button data-tipo="Brasileira" onclick="filtrar('Gremio')" class="btn-time text-xs px-4 py-1 rounded-full bg-white border hover:bg-blue-400 hover:text-white transition">Gremio</button>
+        <button data-tipo="Brasileira" onclick="filtrar('Internacional')" class="btn-time text-xs px-4 py-1 rounded-full bg-white border hover:bg-red-600 hover:text-white transition">Internacional</button>
+        <button data-tipo="Brasileira" onclick="filtrar('Santos')" class="btn-time text-xs px-4 py-1 rounded-full bg-white border hover:bg-gray-100 hover:text-black transition">Santos</button>
+        <button data-tipo="Brasileira" onclick="filtrar('Sport')" class="btn-time text-xs px-4 py-1 rounded-full bg-white border hover:bg-red-700 hover:text-white transition">Sport</button>
+        <button data-tipo="Brasileira" onclick="filtrar('Cruzeiro')" class="btn-time text-xs px-4 py-1 rounded-full bg-white border hover:bg-blue-800 hover:text-white transition">Cruzeiro</button>
+
+        <button data-tipo="Europeia" onclick="filtrar('Real Madrid')" class="btn-time text-xs px-4 py-1 rounded-full bg-white border hover:bg-blue-800 hover:text-white transition">Real Madrid</button>
+        <button data-tipo="Europeia" onclick="filtrar('Barcelona')" class="btn-time text-xs px-4 py-1 rounded-full bg-white border hover:bg-red-800 hover:text-white transition">Barcelona</button>
+        <button data-tipo="Europeia" onclick="filtrar('City')" class="btn-time text-xs px-4 py-1 rounded-full bg-white border hover:bg-blue-300 hover:text-white transition">City</button>
+        <button data-tipo="Europeia" onclick="filtrar('Arsenal')" class="btn-time text-xs px-4 py-1 rounded-full bg-white border hover:bg-red-600 hover:text-white transition">Arsenal</button>
+        <button data-tipo="Europeia" onclick="filtrar('InterM')" class="btn-time text-xs px-4 py-1 rounded-full bg-white border hover:bg-blue-900 hover:text-white transition">InterM</button>
+        <button data-tipo="Europeia" onclick="filtrar('Liverpool')" class="btn-time text-xs px-4 py-1 rounded-full bg-white border hover:bg-red-700 hover:text-white transition">Liverpool</button>
+        <button data-tipo="Europeia" onclick="filtrar('PSG')" class="btn-time text-xs px-4 py-1 rounded-full bg-white border hover:bg-blue-800 hover:text-white transition">PSG</button>
+        <button data-tipo="Europeia" onclick="filtrar('RB Salzburg')" class="btn-time text-xs px-4 py-1 rounded-full bg-white border hover:bg-red-800 hover:text-white transition">RB Salzburg</button>
+        <button data-tipo="Europeia" onclick="filtrar('Manchester UNT')" class="btn-time text-xs px-4 py-1 rounded-full bg-white border hover:bg-red-700 hover:text-white transition">Manchester UNT</button>
+        <button data-tipo="Europeia" onclick="filtrar('Bayern')" class="btn-time text-xs px-4 py-1 rounded-full bg-white border hover:bg-red-600 hover:text-white transition">Bayern</button>
+        <button data-tipo="Europeia" onclick="filtrar('Atletico de Madrid')" class="btn-time text-xs px-4 py-1 rounded-full bg-white border hover:bg-red-700 hover:text-white transition">Atletico de Madrid</button>
+
+        <button data-tipo="Selecao" onclick="filtrar('Brasil')" class="btn-time text-xs px-4 py-1 rounded-full bg-white border hover:bg-yellow-400 hover:text-green-800 transition">Brasil</button>
+        <button data-tipo="Selecao" onclick="filtrar('Argentina')" class="btn-time text-xs px-4 py-1 rounded-full bg-white border hover:bg-blue-200 hover:text-blue-800 transition">Argentina</button>
+        <button data-tipo="Selecao" onclick="filtrar('Alemanha')" class="btn-time text-xs px-4 py-1 rounded-full bg-white border hover:bg-gray-800 hover:text-white transition">Alemanha</button>
+        <button data-tipo="Selecao" onclick="filtrar('Canada')" class="btn-time text-xs px-4 py-1 rounded-full bg-white border hover:bg-red-600 hover:text-white transition">Canada</button>
+        <button data-tipo="Selecao" onclick="filtrar('Croacia')" class="btn-time text-xs px-4 py-1 rounded-full bg-white border hover:bg-red-600 hover:text-white transition">Croacia</button>
+        <button data-tipo="Selecao" onclick="filtrar('Espanha')" class="btn-time text-xs px-4 py-1 rounded-full bg-white border hover:bg-red-700 hover:text-white transition">Espanha</button>
+        <button data-tipo="Selecao" onclick="filtrar('Gales')" class="btn-time text-xs px-4 py-1 rounded-full bg-white border hover:bg-red-600 hover:text-white transition">Gales</button>
+        <button data-tipo="Selecao" onclick="filtrar('Japao')" class="btn-time text-xs px-4 py-1 rounded-full bg-white border hover:bg-blue-900 hover:text-white transition">Japao</button>
+        <button data-tipo="Selecao" onclick="filtrar('Algeria')" class="btn-time text-xs px-4 py-1 rounded-full bg-white border hover:bg-red-600 hover:text-white transition">Algeria</button>
+        <button data-tipo="Selecao" onclick="filtrar('Belgica')" class="btn-time text-xs px-4 py-1 rounded-full bg-white border hover:bg-red-600 hover:text-white transition">Belgica</button>
+        <button data-tipo="Selecao" onclick="filtrar('Chile')" class="btn-time text-xs px-4 py-1 rounded-full bg-white border hover:bg-red-600 hover:text-white transition">Chile</button>
+        <button data-tipo="Selecao" onclick="filtrar('Colombia')" class="btn-time text-xs px-4 py-1 rounded-full bg-white border hover:bg-red-600 hover:text-white transition">Colombia</button>
+        <button data-tipo="Selecao" onclick="filtrar('Costa Rica')" class="btn-time text-xs px-4 py-1 rounded-full bg-white border hover:bg-red-600 hover:text-white transition">Costa Rica</button>
+        <button data-tipo="Selecao" onclick="filtrar('Escocia')" class="btn-time text-xs px-4 py-1 rounded-full bg-white border hover:bg-red-600 hover:text-white transition">Escocia</button>
+        <button data-tipo="Selecao" onclick="filtrar('Finlandia')" class="btn-time text-xs px-4 py-1 rounded-full bg-white border hover:bg-red-600 hover:text-white transition">Finlandia</button>
+        <button data-tipo="Selecao" onclick="filtrar('Franca')" class="btn-time text-xs px-4 py-1 rounded-full bg-white border hover:bg-red-600 hover:text-white transition">Franca</button>
+        <button data-tipo="Selecao" onclick="filtrar('Grecia')" class="btn-time text-xs px-4 py-1 rounded-full bg-white border hover:bg-red-600 hover:text-white transition">Grecia</button>
+        <button data-tipo="Selecao" onclick="filtrar('Inglaterra')" class="btn-time text-xs px-4 py-1 rounded-full bg-white border hover:bg-red-600 hover:text-white transition">Inglaterra</button>
+        <button data-tipo="Selecao" onclick="filtrar('Israel')" class="btn-time text-xs px-4 py-1 rounded-full bg-white border hover:bg-red-600 hover:text-white transition">Israel</button>
+        <button data-tipo="Selecao" onclick="filtrar('Italia')" class="btn-time text-xs px-4 py-1 rounded-full bg-white border hover:bg-red-600 hover:text-white transition">Italia</button>
+        <button data-tipo="Selecao" onclick="filtrar('Katar')" class="btn-time text-xs px-4 py-1 rounded-full bg-white border hover:bg-red-600 hover:text-white transition">Katar</button>
+        <button data-tipo="Selecao" onclick="filtrar('Korea')" class="btn-time text-xs px-4 py-1 rounded-full bg-white border hover:bg-red-600 hover:text-white transition">Korea</button>
+        <button data-tipo="Selecao" onclick="filtrar('Marrocos')" class="btn-time text-xs px-4 py-1 rounded-full bg-white border hover:bg-red-600 hover:text-white transition">Marrocos</button>
+        <button data-tipo="Selecao" onclick="filtrar('Mexico')" class="btn-time text-xs px-4 py-1 rounded-full bg-white border hover:bg-red-600 hover:text-white transition">Mexico</button>
+        <button data-tipo="Selecao" onclick="filtrar('Portugal')" class="btn-time text-xs px-4 py-1 rounded-full bg-white border hover:bg-red-600 hover:text-white transition">Portugal</button>
+        <button data-tipo="Selecao" onclick="filtrar('Tunisia')" class="btn-time text-xs px-4 py-1 rounded-full bg-white border hover:bg-red-600 hover:text-white transition">Tunisia</button>
+        <button data-tipo="Selecao" onclick="filtrar('Uruguai')" class="btn-time text-xs px-4 py-1 rounded-full bg-white border hover:bg-red-600 hover:text-white transition">Uruguai</button>
+        <button data-tipo="Selecao" onclick="filtrar('USA')" class="btn-time text-xs px-4 py-1 rounded-full bg-white border hover:bg-red-600 hover:text-white transition">USA</button>
+
+
+    </div>
+
+    <main id="catalogo" class="max-w-7xl mx-auto px-4 py-12">
+        <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8"></div>
+    </main>
+
+    <footer class="bg-gray-900 text-gray-400 py-10 text-center">
+        <p>&copy; 2026 Minha Marca - Todos os direitos reservados.</p>
+    </footer>
+
+    <script>
+        const SUPABASE_URL = 'https://nglucnzkhofiungybxls.supabase.co'; 
+        const SUPABASE_KEY = 'sb_publishable_FJF9Bp0QtxDwLCfR0ApaKw_wyFfcBfR'; 
+        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        const URL_BASE_STORAGE = `${SUPABASE_URL}/storage/v1/object/public/imagens/`;
+    
+        let produtos = [];
+        let filtroAtual = 'Todos';
+        let isZoomed = false;
+
+        async function buscarProdutosDoBanco() {
+            try {
+                const { data, error } = await _supabase.from('produtos').select('*');
+                if (error) throw error;
+                produtos = data.map(prod => {
+                    const imagensBrutas = Array.isArray(prod.lista_imagens) ? prod.lista_imagens : [];
+                    const imagensCompletas = imagensBrutas.map(img => 
+                        img && !img.startsWith('http') ? URL_BASE_STORAGE + encodeURI(img) : img
+                    );
+                    return { ...prod, imagens: imagensCompletas };
+                });
+                renderizarProdutos();
+            } catch (err) { console.error("Erro na busca:", err); }
+        }
+    
+        function renderizarProdutos(listaParaExibir = null) {
+            const grid = document.getElementById('product-grid');
+            if (!grid) return;
+            const baseProdutos = listaParaExibir ? listaParaExibir : 
+                                (filtroAtual === 'Todos' ? produtos : produtos.filter(p => p.categoria === filtroAtual));
+    
+            if (baseProdutos.length === 0) {
+                grid.innerHTML = `<p class="col-span-full text-center py-12 text-gray-500 italic">Nenhum produto encontrado.</p>`;
+                return;
+            }
+    
+            grid.innerHTML = baseProdutos.map((prod, index) => {
+                const imgPrincipal = prod.imagens && prod.imagens.length > 0 ? prod.imagens[0] : 'https://via.placeholder.com/400';
+                let HTMLMiniaturas = '';
+                if (prod.imagens && prod.imagens.length > 1) {
+                    HTMLMiniaturas = `<div class="flex gap-2 p-4 pb-0 overflow-x-auto">`;
+                    prod.imagens.forEach((img, imgIndex) => {
+                        const classeBorda = imgIndex === 0 ? 'border-indigo-600' : 'border-gray-200';
+                        HTMLMiniaturas += `<img src="${img}" onclick="trocarImagem(this, ${index})" class="miniatura-${index} w-12 h-12 object-cover rounded border-2 ${classeBorda} cursor-pointer transition-all flex-shrink-0">`;
+                    });
+                    HTMLMiniaturas += `</div>`;
+                }
+    
+                return `
+                    <div class="product-card bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 flex flex-col transition-all">
+                        <div class="h-80 overflow-hidden bg-gray-100 cursor-zoom-in group relative">
+                            <img id="main-img-${index}" src="${imgPrincipal}" onclick="abrirZoom(this.src)" class="w-full h-full object-cover transition-all duration-500 group-hover:scale-105">
+                        </div>
+                        ${HTMLMiniaturas}
+                        <div class="p-6 flex-grow flex flex-col">
+                            <span class="text-xs font-bold text-indigo-500 uppercase">${prod.categoria}</span>
+                            <h3 class="text-xl font-bold mt-1 text-gray-900">${prod.nome}</h3>
+                            <p class="text-gray-600 text-sm mt-2 mb-4">${prod.descricao || ''}</p>
+                            <div class="mt-auto">
+                                ${prod.preco ? `<p class="text-indigo-600 font-bold text-lg mb-4">R$ ${prod.preco.toFixed(2).replace('.', ',')}</p>` : ''}
+                                <a href="https://wa.me/5521999999999?text=${encodeURIComponent('Olá! Tenho interesse na ' + prod.nome)}" target="_blank" class="block w-full bg-green-500 text-white text-center py-3 rounded-lg font-bold hover:bg-green-600 transition shadow-md">Tenho Interesse</a>
+                            </div>
+                        </div>
+                    </div>`;
+            }).join('');
+        }
+    
+        function filtrar(time) { filtroAtual = time; renderizarProdutos(); }
+
+        function filtrarPorTipo(tipoEscolhido) {
+            document.querySelectorAll('.btn-time').forEach(btn => {
+                btn.style.display = btn.getAttribute('data-tipo') === tipoEscolhido ? 'inline-block' : 'none';
+            });
+            const filtrados = produtos.filter(p => p.tipo === tipoEscolhido);
+            renderizarProdutos(filtrados);
+        }
+
+        function filtrarGeral() {
+            document.querySelectorAll('.btn-time').forEach(btn => btn.style.display = 'inline-block');
+            filtroAtual = 'Todos';
+            renderizarProdutos();
+        }
+    
+        function trocarImagem(elemento, produtoIndex) {
+            document.getElementById(`main-img-${produtoIndex}`).src = elemento.src;
+            document.querySelectorAll(`.miniatura-${produtoIndex}`).forEach(m => m.classList.replace('border-indigo-600', 'border-gray-200'));
+            elemento.classList.replace('border-gray-200', 'border-indigo-600');
+        }
+    
+        // --- LÓGICA DO ZOOM E LUPA ---
+        function abrirZoom(src) {
+            const modal = document.getElementById('zoom-modal');
+            const img = document.getElementById('img-zoom-modal');
+            img.src = src;
+            img.classList.remove('zoom-active');
+            img.style.transform = 'scale(0.95)';
+            img.style.left = '0px'; img.style.top = '0px';
+            isZoomed = false;
+            modal.style.display = 'flex';
+            setTimeout(() => { modal.classList.remove('opacity-0', 'pointer-events-none'); img.style.transform = 'scale(1)'; }, 10);
+            document.body.style.overflow = 'hidden';
+        }
+    
+        function fecharZoom() {
+            const modal = document.getElementById('zoom-modal');
+            const img = document.getElementById('img-zoom-modal');
+            modal.classList.add('opacity-0', 'pointer-events-none');
+            setTimeout(() => { modal.style.display = 'none'; img.classList.remove('zoom-active'); isZoomed = false; }, 300);
+            document.body.style.overflow = 'auto';
+        }
+
+        // Lupa e Teclado
+        document.getElementById('img-zoom-modal').addEventListener('click', function(e) {
+            e.stopPropagation();
+            isZoomed = !isZoomed;
+            this.classList.toggle('zoom-active');
+            if (!isZoomed) { this.style.left = '0px'; this.style.top = '0px'; }
+        });
+
+        document.getElementById('zoom-modal').addEventListener('mousemove', function(e) {
+            if (!isZoomed) return;
+            const img = document.getElementById('img-zoom-modal');
+            const { clientX, clientY } = e;
+            const { innerWidth, innerHeight } = window;
+            const moveX = (innerWidth / 2 - clientX) * 1.5; 
+            const moveY = (innerHeight / 2 - clientY) * 1.5;
+            img.style.left = `${moveX}px`; img.style.top = `${moveY}px`;
+        });
+
+        document.addEventListener('keydown', (e) => { if (e.key === "Escape") fecharZoom(); });
+    
+        window.onload = buscarProdutosDoBanco;
+    </script>
+</body>
+</html>
